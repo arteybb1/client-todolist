@@ -34,10 +34,23 @@
           {{ errorSearch }}
         </div>
         <div v-if="todoListData.length > 0">
-          <div v-for="todo in todoListData" :key="todo.id" class="todo-item">
+          <div
+            v-for="todo in todoListData"
+            :key="todo.id"
+            class="todo-item"
+            style="position: relative"
+          >
             <div class="todo-content">
               <h3 class="todo-item-title">{{ todo.title }}</h3>
               <span class="todo-status">{{ todo.status }}</span>
+              <label class="custom-checkbox">
+                <input
+                  type="checkbox"
+                  :checked="todo.status === 'DONE'"
+                  @change="(e) => onCheckboxChange(e, todo.id)"
+                />
+                <span class="circle"></span>
+              </label>
             </div>
             <button @click="deleteTodoList(todo.id)" class="todo-delete">DELETE</button>
           </div>
@@ -52,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { createTodo, deleteTodo, getAllTodos } from '@/api/todo/todo.api'
+import { createTodo, deleteTodo, getAllTodos, updateTodoById } from '@/api/todo/todo.api'
 import router from '@/router'
 import { useUserStore } from '@/stores/user.pinia'
 import type { ICreateTodo, ITodo } from '@/type/todo'
@@ -72,6 +85,25 @@ const fetchAllTodo = async () => {
     }
   } catch (error) {
     console.log('error', error)
+  }
+}
+const onCheckboxChange = async (e: Event, id: string) => {
+  const target = e.target as HTMLInputElement
+  const isChecked = target.checked
+  await edit(id, isChecked)
+}
+
+const edit = async (id: string, status: boolean) => {
+  try {
+    const payload = {
+      status: status,
+    }
+    const response = await updateTodoById(id, payload)
+    if (response) {
+      await fetchAllTodo()
+    }
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -217,5 +249,34 @@ onMounted(async () => {
   .todo-delete:hover {
     filter: brightness(85%);
   }
+}
+.custom-checkbox {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.custom-checkbox input[type='checkbox'] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.custom-checkbox .circle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: white;
+  border: 2px solid #000;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.custom-checkbox input[type='checkbox']:checked + .circle {
+  background-color: black;
 }
 </style>

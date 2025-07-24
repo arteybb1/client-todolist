@@ -27,3 +27,12 @@ export const deleteTodo = async (id: string) => {
     return Promise.reject(error)
   }
 }
+
+export const updateTodoById = async (id: string, payload: { status: boolean }) => {
+  try {
+    const { data } = await axios.put(`/todos/update/${id}`, payload)
+    return data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
