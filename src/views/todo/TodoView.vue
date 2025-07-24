@@ -21,7 +21,7 @@
               Sign out
             </button>
             User :
-            {{ userStore.userData?.username }}
+            {{ userStore.user?.username }}
           </div>
         </div>
 
@@ -83,7 +83,7 @@ const create = async () => {
     }
     errorSearch.value = ''
     const payload = {
-      user_id: userStore.userData.id,
+      user_id: userStore.user.id,
       title: inputTodo.value.title,
     }
     const response = await createTodo(payload)

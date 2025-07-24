@@ -3,26 +3,28 @@ import { defineStore } from 'pinia'
 import { getProfile } from '@/api/user/user.api'
 
 type UserPayload = {
-  token: string
+  access_token: string
+  refresh_token: string
 }
 
 export const useUserStore = defineStore(
   'user',
   () => {
-    const user = ref<UserPayload | null>(null)
-    const userData = ref<any>(null)
-    const isLoggedIn = computed(() => !!user.value?.token)
+    const token = ref<UserPayload | null>(null)
+
+    const user = ref<any>(null)
+    const isLoggedIn = computed(() => !!token.value?.access_token)
 
     const logout = () => {
+      token.value = null
       user.value = null
-      userData.value = null
     }
 
     const fetchProfile = async () => {
       try {
         const res = await getProfile()
         if (res && res.user) {
-          userData.value = res.user
+          user.value = res.user
           return res.user
         }
       } catch (error) {
@@ -30,11 +32,16 @@ export const useUserStore = defineStore(
       }
     }
 
+    const setToken = (newToken: UserPayload) => {
+      token.value = newToken
+    }
+
     return {
+      token,
       user,
-      userData,
       isLoggedIn,
       logout,
+      setToken,
       fetchProfile,
     }
   },

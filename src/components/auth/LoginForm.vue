@@ -59,7 +59,7 @@ const submitForm = async () => {
   try {
     const response = await signIn({ username: userForm.username, password: userForm.password })
     if (response) {
-      userStore.user = response
+      userStore.token = response
       await userStore.fetchProfile()
       router.push('/todo')
     }
